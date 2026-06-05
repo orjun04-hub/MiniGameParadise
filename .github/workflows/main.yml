@@ -35,8 +35,12 @@ jobs:
 
     - name: Build APK with Buildozer
       env:
+        # 라이선스 동의 강제 (입력 오류 방지)
         BUILDOZER_ACCEPT_SDK_LICENSE: "1"
       run: |
+        # 꼬인 폴더 구조를 강제로 완전히 삭제
+        rm -rf .buildozer
+        # 빌드 도구를 완전히 새로 설치하며 빌드 시작
         buildozer -v android debug
 
     - name: Upload APK
