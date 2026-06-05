@@ -7,10 +7,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    # Node.js 24 경고를 해결하기 위한 환경 설정
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       BUILDOZER_ACCEPT_SDK_LICENSE: "1"
+      # 안드로이드 SDK 및 도구 경로를 명시적으로 환경 변수에 추가
+      ANDROID_HOME: "/home/runner/.buildozer/android/platform/android-sdk"
+      PATH: "/home/runner/.buildozer/android/platform/android-sdk/build-tools/33.0.1:/home/runner/.buildozer/android/platform/android-sdk/platform-tools:/home/runner/.buildozer/android/platform/android-sdk/tools/bin:${PATH}"
 
     steps:
     - name: Checkout Code
@@ -35,13 +37,13 @@ jobs:
     - name: Install Buildozer
       run: |
         pip install --upgrade pip setuptools wheel
-        pip install "cython<3.0.0" buildozer
+        pip install "cython<3.0.0" buildozer python-for-android
 
     - name: Build APK
       run: |
-        # 이전 빌드 찌꺼기 완전 삭제
+        # 이전 빌드 잔재 삭제
         rm -rf .buildozer
-        # 빌드 도구 경로 문제 방지를 위해 로컬 빌드 환경 강제
+        # 빌드 실행
         buildozer -v android debug
 
     - name: Upload APK
