@@ -14,7 +14,6 @@ jobs:
       with:
         python-version: '3.10'
 
-    # 시스템 충돌을 유발하는 외부 플러그인을 제거하고 리눅스 환경에 직접 패키지 설치
     - name: Install Dependencies
       run: |
         sudo apt-get update
@@ -22,13 +21,11 @@ jobs:
         pip install --upgrade pip setuptools
         pip install "cython<3.0.0" buildozer python-for-android
 
-    # `--user` 권한 거부 에러를 방지하는 치트키 설정 파일 시스템 주입
     - name: Configure PIP
       run: |
         mkdir -p ~/.config/pip
         echo -e "[global]\nuser = false" > ~/.config/pip/pip.conf
 
-    # 🚀 깃허브 컴퓨터에서 직접 buildozer 엔진 가동 (질문 수동 답변 자동 스킵 옵션 적용)
     - name: Build APK with Buildozer
       run: |
         yes y | buildozer -v android debug
