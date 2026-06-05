@@ -12,7 +12,6 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # Buildozer와 가장 호환성이 좋은 파이썬 3.9 버전으로 하향 안정화
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -24,27 +23,26 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    # 시스템 의존성 패키지 일괄 설치
     - name: Install System Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld
 
-    # 가상환경 내부에서 충돌 없는 최적의 버전 조합으로 강제 지정
-    - name: Build APK within Stable Virtual Environment
+    # 가상환경 내부에서 라이선스 자동 수락 플래그를 환경 변수로 완벽히 주입
+    - name: Build APK within Virtual Environment
       env:
         APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
         ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "y"
+        ANDROID_LOG_TAGS: "*:v"
       run: |
         python3 -m venv venv
         source venv/bin/activate
         pip install --upgrade pip setuptools wheel
         pip install "cython==0.29.33"
         pip install "buildozer==1.5.0" python-for-android
+        
+        # SDK 라이선스를 폴더째 사전 승인 처리
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        
         buildozer -v android debug
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: package
-        path: bin/*.apk
