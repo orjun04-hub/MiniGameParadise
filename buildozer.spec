@@ -5,22 +5,18 @@ package.domain = org.orjun04
 source.dir = .
 source.include_exts = py, ttf
 version = 0.1
-
-# 🚀 requirements는 원래대로 깨끗하게 되돌립니다.
 requirements = python3, kivy==2.3.0, kivymd==1.2.0
-
 orientation = portrait
 fullscreen = 1
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
 
-# 🚀 [최종 마침표] 빌도저가 올바르게 인식하는 정석 파이썬 버전 고정 문법입니다.
+# 🚀 [진짜 최종 합의] 에러를 일으키는 python_type 줄을 지우고 버전만 깔끔하게 명시합니다.
 android.api = 33
 android.minapi = 21
 android.ndk = 25b
 android.ndk_api = 21
 android.build_tools_version = 33.0.1
-android.python_type = cpython
 android.python_version = 3.11
 android.private_storage = True
 android.accept_sdk_license = 1
