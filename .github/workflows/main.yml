@@ -6,38 +6,19 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    # 가장 안정적으로 빌도저 환경을 격리해 실행해주는 검증된 액션 도입
+    - name: Build APK with Buildozer Action
+      uses: RobertPhan/buildozer-action@v1.3
       with:
-        python-version: '3.10'
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    # [핵심 수정] buildozer가 요구하는 lld 컴파일러 패키지 추가 설치
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld
-        pip install --upgrade pip setuptools wheel
-        pip install "cython<3.0.0" buildozer python-for-android
-
-    - name: Build APK with Buildozer
-      env:
-        APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
-        ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "y"
-      run: |
-        mkdir -p ~/.buildozer
-        buildozer -v android debug
+        buildozer_version: stable
+        command: buildozer android debug
+        repository_root: .
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
