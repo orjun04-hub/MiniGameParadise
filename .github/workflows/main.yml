@@ -28,16 +28,17 @@ jobs:
 
     - name: Build APK
       run: |
-        # 컴파일러 경로 및 필수 환경 변수 강제 설정
-        export CC=/usr/bin/gcc
-        export CXX=/usr/bin/g++
+        # 빌드 엔진에 직접 스레드 제한 및 환경 변수 전달
         export BUILDOZER_ACCEPT_SDK_LICENSE=1
+        export PATH=$PATH:$HOME/.local/bin
         
-        # 이전 빌드 찌꺼기 삭제
+        # 빌드 엔진 내부 호출 시 사용할 옵션
+        # 1. 이전 빌드 완전 초기화
+        # 2. 멀티스레딩 완전 차단 (j1)
         rm -rf .buildozer
-        
-        # 빌드 시작
-        buildozer -v android debug
+        buildozer --profile android debug -v
+      env:
+        MAKEFLAGS: "-j1"
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
