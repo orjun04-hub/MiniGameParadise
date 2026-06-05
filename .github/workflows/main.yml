@@ -26,7 +26,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache
+        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache
         pip install --upgrade pip setuptools
         pip install "cython<3.0.0" buildozer python-for-android
 
@@ -35,14 +35,15 @@ jobs:
         mkdir -p ~/.config/pip
         echo -e "[global]\nuser = false" > ~/.config/pip/pip.conf
 
+    # [수정] 빌드 중 권한 꼬임 방지 및 상세 로그(log_level=2) 플래그를 주어 안전하게 가동
     - name: Build APK with Buildozer
       env:
         APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
         ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "y"
       run: |
-        buildozer android debug
+        buildozer -v android clean
+        buildozer -v android debug
 
-    # [수정] 차단당하던 v3 대신 최신 v4 버전으로 전면 교체
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
