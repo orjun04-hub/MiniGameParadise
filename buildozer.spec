@@ -5,13 +5,16 @@ package.domain = org.orjun04
 source.dir = .
 source.include_exts = py, ttf
 version = 0.1
-requirements = python3, kivy==2.3.0, kivymd==1.2.0
+
+# 🚀 [진짜 핵심] 미래의 파이썬 3.14가 실행되는 것을 막기 위해 python3==3.11.0 으로 버전을 강제 고정합니다.
+requirements = python3==3.11.0, kivy==2.3.0, kivymd==1.2.0
+
 orientation = portrait
 fullscreen = 1
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
 
-# 🚀 [Aidl 경로 유실 방지] 빌드 도구 버전을 명확히 지정하여 가상 머신이 aidl을 다이렉트로 찾게 만듭니다.
+# 🚀 안정적인 빌드 도구 조합 고정
 android.api = 33
 android.minapi = 21
 android.ndk = 25b
