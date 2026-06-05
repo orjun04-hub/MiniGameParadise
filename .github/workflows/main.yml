@@ -17,11 +17,17 @@ jobs:
       with:
         python-version: '3.10'
 
-    # 안드로이드 SDK 라이선스 자동 동의 및 빌도저 필수 도구 전면 추가
+    # 17 버전 자바 환경을 깃허브 공식 액션으로 완벽하게 세팅 및 환경변수 자동 주입
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache
+        sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache
         pip install --upgrade pip setuptools
         pip install "cython<3.0.0" buildozer python-for-android
 
@@ -30,9 +36,16 @@ jobs:
         mkdir -p ~/.config/pip
         echo -e "[global]\nuser = false" > ~/.config/pip/pip.conf
 
-    # 🚀 깃허브 가상 컴퓨터가 멈추지 않도록 자동 동의 환경변수를 먹이고 빌드 가동
+    # 🚀 자바 가동 경로(JAVA_HOME)를 물리고 라이선스 자동 동의 플래그와 함께 빌드 시작
     - name: Build APK with Buildozer
       env:
         APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
+        ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "y"
       run: |
         buildozer android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: package
+        path: bin/*.apk
