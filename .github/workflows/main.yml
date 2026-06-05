@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04  # 가장 안정적인 기존 장기 지원 버전으로 고정
 
     steps:
     - name: Checkout Code
@@ -15,7 +15,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.10'
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -26,22 +26,18 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache
-        pip install --upgrade pip setuptools
+        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache
+        pip install --upgrade pip setuptools wheel
         pip install "cython<3.0.0" buildozer python-for-android
 
-    # 루트 권한 문제를 피하기 위해 작업 디렉토리의 소유권을 확실히 지정
-    - name: Fix Directory Permissions
-      run: |
-        sudo chown -R runner:docker .
-
-    # 🚀 일반 사용자 권한 환경에서 순수 빌도저 가동
+    # 🚀 핵심 수정: 빌도저 작업 경로를 완벽하게 일반 사용자 권한 폴더로 이관
     - name: Build APK with Buildozer
       env:
         APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
         ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "y"
       run: |
-        buildozer android debug
+        mkdir -p ~/.buildozer
+        buildozer -v android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
