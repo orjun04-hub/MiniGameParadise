@@ -1,100 +1,59 @@
-# main.py 전체 코드
-import os
-import json
-import threading
+name: Build APK
 
-os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
-os.environ['KIVY_IMAGE'] = 'sdl2'
+on:
+  push:
+  workflow_dispatch:
 
-from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager
-from kivy.core.text import LabelBase
-from kivy.utils import get_color_from_hex
+jobs:
+  build:
+    # 🚀 빌도저 및 안드로이드 SDK 빌드 도구와 가장 호환성이 좋은 우분투 최신 버전으로 변경합니다.
+    runs-on: ubuntu-latest
 
-LabelBase.register(name='NanumGothic', fn_regular='fonts/NanumGothic-Bold.ttf')
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-from screens.login_screen import LoginScreen
-from screens.menu_screen import MenuScreen
-from screens.number_memory import NumberMemoryScreen
-from screens.reaction_speed import ReactionSpeedScreen
-from screens.rps_screen import RPSScreen
-from screens.ranking_screen import RankingScreen
-from screens.color_match import ColorMatchScreen
-from screens.quick_math import QuickMathScreen
-from screens.pong_game import PongScreen
-from screens.space_dodger import SpaceDodgerScreen
+    - name: Free Disk Space
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-os.makedirs(DATA_DIR, exist_ok=True)
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-class MiniGameApp(App):
-    player_name = 'Player'
-    data_dir = DATA_DIR
+    # 🚀 자바 환경을 안드로이드 구형/신형 빌드 도구 모두와 호환되는 JDK 17로 세팅합니다.
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-    bg_color = get_color_from_hex('#F4F6F9')
-    primary_color = get_color_from_hex('#2ECC71')
-    secondary_color = get_color_from_hex('#3498DB')
-    accent_color = get_color_from_hex('#E74C3C')
-    text_dark = get_color_from_hex('#2C3E50')
+    # 🚀 aidl 실행에 필요한 모든 32비트/64비트 크로스 컴파일 라이브러리를 하나도 빠짐없이 주입합니다.
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld g++-multilib lib32z1 lib32ncurses6 lib32stdc++6 libstdc++6
 
-    def build(self):
-        self.title = '미니게임 파라다이스 종합 7-in-1'
-        self.account_info = self.load_account()
-        if self.account_info:
-            self.player_name = self.account_info.get('username', 'Player')
+    - name: Install Buildozer and Cython
+      run: |
+        pip install --upgrade pip setuptools wheel
+        pip install "cython<3.0.0" buildozer python-for-android
 
-        sm = ScreenManager()
-        sm.add_widget(LoginScreen(name='login'))
-        sm.add_widget(MenuScreen(name='menu'))
-        sm.add_widget(NumberMemoryScreen(name='number_memory'))
-        sm.add_widget(ReactionSpeedScreen(name='reaction_speed'))
-        sm.add_widget(RPSScreen(name='rps'))
-        sm.add_widget(RankingScreen(name='ranking'))
-        sm.add_widget(ColorMatchScreen(name='color_match'))
-        sm.add_widget(QuickMathScreen(name='quick_math'))
-        sm.add_widget(PongScreen(name='pong'))
-        sm.add_widget(SpaceDodgerScreen(name='space_dodger'))
-        
-        # 자동 진입을 막고 무조건 login 화면이 먼저 뜨도록 강제 지정!
-        sm.current = 'login' 
-        return sm
+    # 🚀 라이선스 자동 동의 및 빌도저 내부 SDK 패키징 엔진 강제 연동
+    - name: Build APK with Buildozer
+      env:
+        BUILDOZER_ACCEPT_SDK_LICENSE: "1"
+        APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
+        ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "1"
+      run: |
+        buildozer -v android debug
 
-    def play_sound(self, sound_type):
-        pass
-
-    def get_account_file(self): return os.path.join(self.data_dir, 'account.json')
-    def load_account(self):
-        f = self.get_account_file()
-        if os.path.exists(f):
-            try:
-                with open(f, 'r', encoding='utf-8') as fp: return json.load(fp)
-            except Exception: pass
-        return None
-    def save_account(self, username, password):
-        with open(self.get_account_file(), 'w', encoding='utf-8') as fp:
-            json.dump({"username": username, "password": password}, fp, ensure_ascii=False, indent=2)
-
-    def get_ranking_file(self): return os.path.join(self.data_dir, 'ranking.json')
-    def load_rankings(self):
-        f = self.get_ranking_file()
-        if os.path.exists(f):
-            try:
-                with open(f, 'r', encoding='utf-8') as fp: return json.load(fp)
-            except Exception: pass
-        return {"number_memory": [], "reaction_speed": [], "rps": [], "color_match": [], "quick_math": [], "pong": [], "space_dodger": []}
-
-    def save_rankings(self, data):
-        with open(self.get_ranking_file(), 'w', encoding='utf-8') as fp:
-            json.dump(data, fp, ensure_ascii=False, indent=2)
-
-    def add_ranking(self, game, name, score):
-        r = self.load_rankings()
-        if game not in r: r[game] = []
-        r[game].append({"name": name, "score": score})
-        if game == "reaction_speed": r[game].sort(key=lambda x: x["score"])
-        else: r[game].sort(key=lambda x: x["score"], reverse=True)
-        r[game] = r[game][:3]
-        self.save_rankings(r)
-
-if __name__ == '__main__':
-    MiniGameApp().run()
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: package
+        path: bin/*.apk
