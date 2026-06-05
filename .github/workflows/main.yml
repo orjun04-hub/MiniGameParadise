@@ -28,16 +28,19 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld
 
+    # 가상 머신에 빌도저 툴체인을 순수 유저 권한으로 깔끔하게 재설치
     - name: Install Buildozer and Cython
       run: |
         pip install --upgrade pip setuptools wheel
         pip install "cython<3.0.0" buildozer python-for-android
 
-    # 🚀 [핵심 조치] FileNotFoundError를 유발하는 clean 명령을 빼고 곧바로 순수 빌드만 실행합니다.
+    # 🚀 [핵심 조치] 빌도저 파서가 'y'를 읽기 전에 1(True)과 정수로 가상환경 설정을 덮어써버립니다.
     - name: Build APK with Buildozer
       env:
-        APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
-        ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "y"
+        BUILDOZER_ACCEPT_SDK_LICENSE: "1"
+        APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
+        ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "1"
+        BUILDOZER_ALLOW_KIVY_NEW_VERSION: "1"
       run: |
         buildozer -v android debug
 
