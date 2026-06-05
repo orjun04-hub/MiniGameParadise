@@ -17,10 +17,11 @@ jobs:
       with:
         python-version: '3.10'
 
+    # 안드로이드 SDK 라이선스 자동 동의 및 빌도저 필수 도구 전면 추가
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev
+        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache
         pip install --upgrade pip setuptools
         pip install "cython<3.0.0" buildozer python-for-android
 
@@ -29,13 +30,9 @@ jobs:
         mkdir -p ~/.config/pip
         echo -e "[global]\nuser = false" > ~/.config/pip/pip.conf
 
-    # [수정] 강제 주입 파이프라인(yes y |)을 제거하고 순수 buildozer 백그라운드 명령으로 변경
+    # 🚀 깃허브 가상 컴퓨터가 멈추지 않도록 자동 동의 환경변수를 먹이고 빌드 가동
     - name: Build APK with Buildozer
+      env:
+        APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
       run: |
-        buildozer -v android debug
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v3
-      with:
-        name: package
-        path: bin/*.apk
+        buildozer android debug
