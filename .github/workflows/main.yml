@@ -7,8 +7,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    # Node.js 24 경고를 해결하기 위한 환경 설정
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      BUILDOZER_ACCEPT_SDK_LICENSE: "1"
 
     steps:
     - name: Checkout Code
@@ -25,20 +27,21 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Install Dependencies
+    - name: Install System Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld g++-multilib lib32z1 lib32ncurses6 lib32stdc++6 libstdc++6
+
+    - name: Install Buildozer
+      run: |
         pip install --upgrade pip setuptools wheel
         pip install "cython<3.0.0" buildozer
 
     - name: Build APK
-      env:
-        BUILDOZER_ACCEPT_SDK_LICENSE: "1"
       run: |
-        # 캐시를 완전히 비우고 새로 빌드
+        # 이전 빌드 찌꺼기 완전 삭제
         rm -rf .buildozer
-        # 빌드 전용 환경 설정 및 빌드 실행
+        # 빌드 도구 경로 문제 방지를 위해 로컬 빌드 환경 강제
         buildozer -v android debug
 
     - name: Upload APK
