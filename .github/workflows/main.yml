@@ -4,7 +4,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # 구글 코랩과 달리 충돌 없는 안전한 리눅스 버전 고정
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
@@ -20,8 +20,9 @@ jobs:
         path: ~/.buildozer
         key: buildozer-global-${{ steps.get-date.outputs.date }}
 
+    # [수정 포인트] 대소문자 오류를 고친 공식 액션 라이브러리로 교체
     - name: Build with Buildozer
-      uses: ArtemGovorov/buildozer-action@v1
+      uses: artemgovorov/buildozer-action@v1.5.0
       id: buildozer
       with:
         command: buildozer -v android debug
