@@ -6,8 +6,7 @@ on:
 
 jobs:
   build:
-    # 🚀 빌도저 및 안드로이드 SDK 빌드 도구와 가장 호환성이 좋은 우분투 최신 버전으로 변경합니다.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout Code
@@ -23,16 +22,14 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
-    # 🚀 자바 환경을 안드로이드 구형/신형 빌드 도구 모두와 호환되는 JDK 17로 세팅합니다.
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    # 🚀 aidl 실행에 필요한 모든 32비트/64비트 크로스 컴파일 라이브러리를 하나도 빠짐없이 주입합니다.
     - name: Install System Dependencies
       run: |
         sudo apt-get update
@@ -43,7 +40,7 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install "cython<3.0.0" buildozer python-for-android
 
-    # 🚀 라이선스 자동 동의 및 빌도저 내부 SDK 패키징 엔진 강제 연동
+    # 🚀 [오류 해결] 뼈대 폴더를 깨뜨리는 android clean 명령을 빼고, 곧바로 무결성 빌드에 진입합니다.
     - name: Build APK with Buildozer
       env:
         BUILDOZER_ACCEPT_SDK_LICENSE: "1"
