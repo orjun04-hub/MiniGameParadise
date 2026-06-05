@@ -11,7 +11,7 @@ fullscreen = 1
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
 
-# 🚀 [핵심 수정] 참/거짓 판단 오류를 일으키는 'y' 대신 확실한 정수값 '1'을 적용합니다.
+# 🚀 알파벳 'y'나 참/거짓 판단을 흐리는 문자를 완벽히 제거한 표준 세팅
 android.api = 33
 android.minapi = 21
 android.ndk_api = 21
