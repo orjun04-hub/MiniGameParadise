@@ -11,7 +11,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Install System Dependencies
+    - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld g++-multilib lib32z1 lib32ncurses6 lib32stdc++6 libstdc++6 tar
@@ -28,7 +28,15 @@ jobs:
 
     - name: Build APK
       run: |
+        # 컴파일러 경로 및 필수 환경 변수 강제 설정
+        export CC=/usr/bin/gcc
+        export CXX=/usr/bin/g++
         export BUILDOZER_ACCEPT_SDK_LICENSE=1
+        
+        # 이전 빌드 찌꺼기 삭제
+        rm -rf .buildozer
+        
+        # 빌드 시작
         buildozer -v android debug
 
     - name: Upload Artifacts
