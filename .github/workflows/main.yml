@@ -28,7 +28,6 @@ jobs:
 
     - name: Build APK
       run: |
-        # 환경 변수 직접 설정
         export BUILDOZER_ACCEPT_SDK_LICENSE=1
         buildozer -v android debug
 
