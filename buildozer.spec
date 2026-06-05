@@ -11,17 +11,12 @@ fullscreen = 1
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
 
-# Gradle 버전 충돌 방지를 위한 API 및 빌드 버전 강제 고정
+# Python 3.9 / Kivy 2.3.0 조합과 가장 발이 잘 맞는 안드로이드 타겟 세팅
 android.api = 33
 android.minapi = 21
-android.ndk_api = 24
+android.ndk_api = 21
 android.private_storage = True
 android.accept_sdk_license = 1
-
-# [핵심 수정] 에러 메시지가 요구한 Gradle 8.0 이상 버전을 강제로 주입합니다.
-android.gradle_dependencies = 
-android.gradle_version = 8.0
-android.android_gradle_plugin_version = 8.1.0
 
 [buildozer]
 log_level = 2
