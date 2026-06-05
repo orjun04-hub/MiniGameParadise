@@ -29,9 +29,10 @@ jobs:
         mkdir -p ~/.config/pip
         echo -e "[global]\nuser = false" > ~/.config/pip/pip.conf
 
+    # [수정] 강제 주입 파이프라인(yes y |)을 제거하고 순수 buildozer 백그라운드 명령으로 변경
     - name: Build APK with Buildozer
       run: |
-        yes y | buildozer -v android debug
+        buildozer -v android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
