@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # 가장 안정적인 기존 장기 지원 버전으로 고정
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout Code
@@ -23,14 +23,14 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    # [핵심 수정] buildozer가 요구하는 lld 컴파일러 패키지 추가 설치
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache
+        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld
         pip install --upgrade pip setuptools wheel
         pip install "cython<3.0.0" buildozer python-for-android
 
-    # 🚀 핵심 수정: 빌도저 작업 경로를 완벽하게 일반 사용자 권한 폴더로 이관
     - name: Build APK with Buildozer
       env:
         APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
