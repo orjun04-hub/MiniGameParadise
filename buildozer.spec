@@ -20,6 +20,10 @@ android.build_tools_version = 33.0.1
 android.python_version = 3.11
 android.private_storage = True
 android.accept_sdk_license = 1
+# ... 기존 설정들 ...
+# 이 줄을 [app] 섹션에 추가하세요:
+android.sdk_path = /home/runner/.buildozer/android/platform/android-sdk
+android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r25b
 
 [buildozer]
 log_level = 2
