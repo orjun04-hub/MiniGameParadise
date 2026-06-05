@@ -12,13 +12,6 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # 🚀 [오류 박멸 핵심] 기존에 꼬여있던 이전 빌드의 가상환경(venv) 및 .buildozer 폴더 잔재를 완전히 깨끗하게 지워버립니다.
-    - name: Clean Existing Cache & Venv
-      run: |
-        rm -rf venv
-        rm -rf .buildozer
-        rm -rf .pytest_cache
-
     - name: Free Disk Space
       run: |
         sudo rm -rf /usr/share/dotnet
@@ -47,14 +40,11 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install "cython<3.0.0" buildozer python-for-android
 
-    # 🚀 빌도저가 완전히 무결한 상태에서 새로 다운로드를 시작하도록 clean 명령 후 빌드를 실행합니다.
     - name: Build APK with Buildozer
       env:
         BUILDOZER_ACCEPT_SDK_LICENSE: "1"
-        APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
-        ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "1"
       run: |
-        buildozer android clean
+        buildozer distclean
         buildozer -v android debug
 
     - name: Upload APK
