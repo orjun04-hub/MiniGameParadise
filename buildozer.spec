@@ -11,13 +11,11 @@ fullscreen = 1
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
 
-# 빌드 엔진 설정
 android.api = 33
 android.minapi = 21
 android.ndk = 25b
 android.ndk_api = 21
 android.build_tools_version = 33.0.1
-android.python_version = 3.11
 android.private_storage = True
 android.accept_sdk_license = 1
 
