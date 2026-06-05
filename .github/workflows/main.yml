@@ -8,10 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-    - name: Checkout
+    - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Install Dependencies
+    - name: Install System Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld g++-multilib lib32z1 lib32ncurses6 lib32stdc++6 libstdc++6 tar
@@ -28,19 +28,23 @@ jobs:
 
     - name: Build APK
       run: |
-        # 빌드 엔진에 직접 스레드 제한 및 환경 변수 전달
+        # 라이선스 자동 동의
         export BUILDOZER_ACCEPT_SDK_LICENSE=1
-        export PATH=$PATH:$HOME/.local/bin
         
-        # 빌드 엔진 내부 호출 시 사용할 옵션
-        # 1. 이전 빌드 완전 초기화
-        # 2. 멀티스레딩 완전 차단 (j1)
+        # 권한 문제 해결을 위해 빌드 폴더를 미리 생성하고 권한 전체 개방
         rm -rf .buildozer
-        buildozer --profile android debug -v
+        mkdir -p .buildozer
+        chmod -R 777 .buildozer
+        
+        # 빌드 도구가 생성하는 모든 파일에 접근 가능하도록 설정
+        buildozer -v android debug
+        
+        # 결과물 권한 강제 변경
+        chmod -R 777 bin/
       env:
         MAKEFLAGS: "-j1"
 
-    - name: Upload Artifacts
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: package
