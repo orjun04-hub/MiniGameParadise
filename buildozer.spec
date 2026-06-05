@@ -11,7 +11,7 @@ fullscreen = 1
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
 
-# Python 3.9 / Kivy 2.3.0 조합과 가장 발이 잘 맞는 안드로이드 타겟 세팅
+# 🚀 [핵심 수정] 참/거짓 판단 오류를 일으키는 'y' 대신 확실한 정수값 '1'을 적용합니다.
 android.api = 33
 android.minapi = 21
 android.ndk_api = 21
