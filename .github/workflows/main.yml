@@ -28,12 +28,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libssl-dev libgdbm-dev libreadline-dev libffi-dev uuid-dev ccache lld
 
-    # 가상환경 내부에서 라이선스 자동 수락 플래그를 환경 변수로 완벽히 주입
+    # 🚀 [핵심 조치] 이전의 찌꺼기(y 에러 유발자)가 남아있는 빌도저 임시 폴더를 완전히 밀어버립니다.
     - name: Build APK within Virtual Environment
-      env:
-        APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
-        ANDROID_LAUNCHER_ACCEPT_SDK_LICENSE: "y"
-        ANDROID_LOG_TAGS: "*:v"
       run: |
         python3 -m venv venv
         source venv/bin/activate
@@ -41,8 +37,9 @@ jobs:
         pip install "cython==0.29.33"
         pip install "buildozer==1.5.0" python-for-android
         
-        # SDK 라이선스를 폴더째 사전 승인 처리
         mkdir -p ~/.android
         touch ~/.android/repositories.cfg
         
+        # 이전 빌드 찌꺼기 완전 삭제(clean) 후 순수 컴파일 진행
+        buildozer android clean
         buildozer -v android debug
